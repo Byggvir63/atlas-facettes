@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atlas des Facettes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep: #121A1E;
+    --bg-panel: #1A2327;
+    --bg-panel-hover: #1F2A2F;
+    --ink: #E9E2CC;
+    --ink-soft: #C8C0A8;
+    --brass: #B98D4A;
+    --brass-bright: #D9AD6B;
+    --copper-muted: #8A7A5E;
+    --rule: rgba(185,141,74,0.28);
+    --rule-bright: rgba(217,173,107,0.6);
+    --dim: #5F6A6C;
+    --font-display: 'Cormorant Garamond', serif;
+    --font-body: 'Work Sans', sans-serif;
+  }
+ 
+  *{ box-sizing: border-box; }
+ 
+  html,body{
+    margin:0;
+    padding:0;
+    background: var(--bg-deep);
+    color: var(--ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+ 
+  body{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+ 
+  a{ color: inherit; }
+ 
+  .wrap{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 clamp(1.25rem, 4vw, 3rem);
+    width:100%;
+  }
+ 
+  /* ---------- header ---------- */
+ 
+  header{
+    position:relative;
+    padding: clamp(3.5rem, 8vw, 6rem) 0 clamp(2.5rem, 6vw, 3.5rem);
+    overflow:hidden;
+    border-bottom: 1px solid var(--rule);
+  }
+ 
+  .compass{
+    position:absolute;
+    top:50%;
+    right: clamp(-6rem, -2vw, 2rem);
+    transform: translateY(-50%);
+    width: min(46vw, 520px);
+    height: min(46vw, 520px);
+    opacity: 0.35;
+    color: var(--brass);
+    pointer-events:none;
+  }
+ 
+  .eyebrow{
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    color: var(--copper-muted);
+    margin: 0 0 0.9rem;
+    font-weight: 500;
+  }
+ 
+  h1{
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2.6rem, 6vw, 4.4rem);
+    line-height: 1.05;
+    margin: 0 0 1.1rem;
+    max-width: 14ch;
+    color: var(--ink);
+  }
+ 
+  .lede{
+    font-size: clamp(1rem, 1.4vw, 1.15rem);
+    line-height: 1.6;
+    color: var(--ink-soft);
+    max-width: 46ch;
+    margin: 0;
+  }
+ 
+  .lede em{
+    font-style: italic;
+    color: var(--brass-bright);
+  }
+ 
+  /* ---------- legend ---------- */
+ 
+  .legend{
+    display:flex;
+    gap: 1.75rem;
+    margin-top: 2.4rem;
+    flex-wrap: wrap;
+  }
+ 
+  .legend-item{
+    display:flex;
+    align-items:center;
+    gap: 0.55rem;
+    font-size: 0.82rem;
+    color: var(--copper-muted);
+  }
+ 
+  .legend-dot{
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display:inline-block;
+    flex-shrink:0;
+  }
+  .legend-dot.on{ background: var(--brass-bright); }
+  .legend-dot.off{ background: transparent; border: 1px solid var(--dim); }
+ 
+  /* ---------- grid ---------- */
+ 
+  main{
+    flex: 1;
+    padding: clamp(2.5rem, 6vw, 4rem) 0 clamp(3rem, 7vw, 5rem);
+  }
+ 
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+  }
+ 
+  @media (max-width: 900px){
+    .grid{ grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 580px){
+    .grid{ grid-template-columns: 1fr; }
+  }
+ 
+  .plate{
+    position:relative;
+    background: var(--bg-panel);
+    padding: 2rem 1.6rem 1.6rem;
+    display:flex;
+    flex-direction:column;
+    min-height: 250px;
+    opacity:0;
+    transform: translateY(10px);
+    animation: rise 0.6s ease forwards;
+    transition: background 0.25s ease;
+  }
+ 
+  @keyframes rise{
+    to{ opacity:1; transform:none; }
+  }
+ 
+  .plate.active:hover,
+  .plate.active:focus-within{
+    background: var(--bg-panel-hover);
+  }
+ 
+  .plate-number{
+    position:absolute;
+    top: 1.1rem;
+    right: 1.3rem;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 0.85rem;
+    color: var(--dim);
+  }
+ 
+  .icon{
+    width: 38px;
+    height: 38px;
+    color: var(--brass);
+    margin-bottom: 1.1rem;
+    transition: color 0.25s ease;
+  }
+  .plate.active:hover .icon,
+  .plate.active:focus-within .icon{ color: var(--brass-bright); }
+ 
+  .plate h2{
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.85rem;
+    margin: 0 0 0.35rem;
+    color: var(--ink);
+  }
+ 
+  .domain{
+    font-size: 0.74rem;
+    color: var(--copper-muted);
+    line-height: 1.5;
+    margin: 0 0 0.9rem;
+    letter-spacing: 0.01em;
+  }
+ 
+  .caption{
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.02rem;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    margin: 0;
+    flex:1;
+  }
+ 
+  .status-row{
+    margin-top: 1.4rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--rule);
+  }
+ 
+  .status{
+    font-size: 0.78rem;
+    color: var(--dim);
+    display:flex;
+    align-items:center;
+    gap: 0.5rem;
+  }
+ 
+  .status .legend-dot{ margin-top: -1px; }
+ 
+  a.visit{
+    display:flex;
+    align-items:center;
+    gap: 0.5rem;
+    font-size: 0.86rem;
+    font-weight: 500;
+    color: var(--brass-bright);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    width: fit-content;
+    padding-bottom: 1px;
+    transition: border-color 0.2s ease;
+  }
+ 
+  a.visit:hover, a.visit:focus{
+    border-bottom-color: var(--brass-bright);
+  }
+ 
+  /* ---------- footer ---------- */
+ 
+  footer{
+    border-top: 1px solid var(--rule);
+    padding: 1.8rem 0;
+  }
+ 
+  footer .wrap{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap: 0.8rem;
+  }
+ 
+  .colophon{
+    font-size: 0.8rem;
+    color: var(--dim);
+  }
+ 
+  .colophon strong{
+    color: var(--copper-muted);
+    font-weight: 500;
+  }
+ 
+  @media (prefers-reduced-motion: reduce){
+    .plate{ animation: none; opacity:1; transform:none; }
+  }
+</style>
+</head>
+<body>
+ 
+<header>
+  <div class="wrap">
+    <svg class="compass" viewBox="0 0 200 200" aria-hidden="true">
+      <circle cx="100" cy="100" r="94" fill="none" stroke="currentColor" stroke-width="0.6"/>
+      <circle cx="100" cy="100" r="70" fill="none" stroke="currentColor" stroke-width="0.4"/>
+      <line x1="100" y1="4" x2="100" y2="196" stroke="currentColor" stroke-width="0.4"/>
+      <line x1="4" y1="100" x2="196" y2="100" stroke="currentColor" stroke-width="0.4"/>
+      <path d="M100 26 L108 100 L100 174 L92 100 Z" fill="none" stroke="currentColor" stroke-width="0.8"/>
+      <path d="M26 100 L100 92 L174 100 L100 108 Z" fill="none" stroke="currentColor" stroke-width="0.5"/>
+      <circle cx="100" cy="100" r="3" fill="currentColor"/>
+    </svg>
+ 
+    <p class="eyebrow">Répertoire personnel</p>
+    <h1>Atlas des facettes</h1>
+    <p class="lede">Une personne, onze territoires. Chacun porte un nom, un domaine, une manière de regarder le monde — <em>trois y ont déjà bâti leur maison.</em></p>
+ 
+    <div class="legend">
+      <span class="legend-item"><span class="legend-dot on"></span>Site ouvert</span>
+      <span class="legend-item"><span class="legend-dot off"></span>À créer</span>
+    </div>
+  </div>
+</header>
+ 
+<main>
+  <div class="wrap">
+    <div class="grid" id="grid">
+ 
+      <!-- 1. Thalweg -->
+      <article class="plate" style="animation-delay:0.02s">
+        <span class="plate-number">I</span>
+        <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 34 L16 14 L24 26 L32 8 L44 34"/><circle cx="24" cy="26" r="1.6" fill="currentColor" stroke="none"/></svg>
+        <h2>Thalweg</h2>
+        <p class="domain">Aventure et trekking</p>
+        <p class="caption">Sentiers, sommets, lignes de crête.</p>
+        <div class="status-row">
+          <span class="status"><span class="legend-dot off"></span>À créer</span>
+        </div>
+      </article>
+ 
+      <!-- 2. Besant -->
+      <article class="plate" style="animation-delay:0.06s">
+        <span class="plate-number">II</span>
+        <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="15"/><circle cx="24" cy="24" r="7"/></svg>
+        <h2>Besant</h2>
+        <p class="domain">Finance, entreprises, économie et immobilier</p>
+        <p class="caption">Comptes, marchés, fondations bâties.</p>
+        <div class="status-row">
+          <span class="status"><span class="legend-dot off"></span>À créer</span>
+        </div>
+      </article>
+ 
+      <!-- 3. Atelier -->
+      <article class="plate" style="animation-delay:0.10s">
+        <span class="plate-number">III</span>
+        <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 40 L30 18"/><path d="M27 15 C29 13 33 13 35 15 C37 17 37 21 35 23 L32 26 L24 18 Z"/></svg>
+        <h2>Atelier</h2>
+        <p class="domain">Art, littérature, musique et cinéma</p>
+        <p class="caption">Toiles, pages, partitions, pellicule.</p>
+        <div class="status-row">
+          <span class="status"><span class="legend-dot off"></span>À créer</span>
+        </div>
+      </article>
+ 
+      <!-- 4. Panache -->
+      <article class="plate" style="animation-delay:0.14s">
+        <span class="plate-number">IV</span>
+        <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M24 6 C30 14 30 30 20 42"/><path d="M24 12 L17 15 M25 18 L17 22 M26 24 L18 29 M25 30 L19 35"/></svg>
+        <h2>Panache</h2>
+        <p class="domain">Vestimentaire, éloquence, montres</p>
+        <p class="caption">Coupe, mots choisis, mécanismes.</p>
+        <div class="status-row">
+          <span class="status"><span class="legend-dot off"></span>À créer</span>
+        </div>
+      </article>
+ 
+      <!-- 5. Pérégrin (LIVE) -->
+      <article class="plate active" style="animation-delay:0.18s">
+        <span class="plate-number">V</span>
+        <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="17"/><path d="M24 9 L24 15 M24 33 L24 39 M9 24 L15 24 M33 24 L39 24"/><path d="M24 24 L30 14 L24 24 L18 34 Z" fill="currentColor" stroke="none"/></svg>
+        <h2>Pérégrin</h2>
+        <p class="domain">Voyages, langues et cultures</p>
+        <p class="caption">Cartes, frontières, mots nouveaux.</p>
+        <div class="status-row">
+          <a class="visit" href="https://byggvir63.github.io/geographie/">Ouvrir Pérégrin</a>
+        </div>
+      </article>
+ 
+      <!-- 6. Naturalia -->
+      <article class="plate" style="animation-delay:0.22s">
+        <span class="plate-number">VI</span>
+        <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M24 8 C36 12 40 26 24 40 C8 26 12 12 24 8 Z"/><path d="M24 10 L24 38"/></svg>
+        <h2>Naturalia</h2>
+        <p class="domain">Faune, flore, climatologie et minéralogie</p>
+        <p class="caption">Espèces, cristaux, ciels changeants.</p>
+        <div class="status-row">
+          <span class="status"><span class="legend-dot off"></span>À créer</span>
+        </div>
+      </article>
+ 
+      <!-- 7. Athlon -->
+      <article class="plate" style="animation-delay:0.26s">
+        <span class="plate-number">VII</span>
+        <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 24 C14 18 14 30 22 24"/><path d="M26 24 C34 18 34 30 42 24"/><path d="M22 24 L26 24"/></svg>
+        <h2>Athlon</h2>
+        <p class="domain">Sport, trail et running</p>
+        <p class="caption">Foulées, dénivelés, chronomètres.</p>
+        <div class="status-row">
+          <span class="status"><span class="legend-dot off"></span>À créer</span>
+        </div>
+      </article>
+ 
+      <!-- 8. Epicure -->
+      <article class="plate" style="animation-delay:0.30s">
+        <span class="plate-number">VIII</span>
+        <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 8 L34 8 L27 26 C27 30 21 30 21 26 Z"/><path d="M24 30 L24 40"/><path d="M16 40 L32 40"/></svg>
+        <h2>Epicure</h2>
+        <p class="domain">Gastronomie, cuisine, œnologie, mixologie</p>
+        <p class="caption">Tables, vignes, alambics.</p>
+        <div class="status-row">
+          <span class="status"><span class="legend-dot off"></span>À créer</span>
+        </div>
+      </article>
+ 
+      <!-- 9. Feréol (LIVE) -->
+      <article class="plate active" style="animation-delay:0.34s">
+        <span class="plate-number">IX</span>
+        <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="12" r="3.4"/><path d="M24 15.4 L24 24"/><path d="M24 24 L14 36 M24 24 L34 36"/><circle cx="14" cy="39" r="3"/><circle cx="34" cy="39" r="3"/></svg>
+        <h2>Feréol</h2>
+        <p class="domain">Histoire et généalogie</p>
+        <p class="caption">Archives, lignées, actes anciens.</p>
+        <div class="status-row">
+          <a class="visit" href="https://byggvir63.github.io/chronique-familiale/">Ouvrir Feréol</a>
+        </div>
+      </article>
+ 
+      <!-- 10. Arda -->
+      <article class="plate" style="animation-delay:0.38s">
+        <span class="plate-number">X</span>
+        <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="11"/><ellipse cx="24" cy="24" rx="19" ry="6.5" transform="rotate(-18 24 24)"/></svg>
+        <h2>Arda</h2>
+        <p class="domain">Fantasy, science-fiction et cosmogonie</p>
+        <p class="caption">Mondes inventés, étoiles lointaines.</p>
+        <div class="status-row">
+          <span class="status"><span class="legend-dot off"></span>À créer</span>
+        </div>
+      </article>
+ 
+      <!-- 11. Focus (LIVE) -->
+      <article class="plate active" style="animation-delay:0.42s">
+        <span class="plate-number">XI</span>
+        <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="17"/><path d="M24 13 L29 24 L24 35 L19 24 Z"/><path d="M13 24 L35 24 M24 13 L24 35" stroke-width="0.9" opacity="0.6"/></svg>
+        <h2>Focus</h2>
+        <p class="domain">Photographie et vidéo</p>
+        <p class="caption">Cadrages, lumières, instants fixés.</p>
+        <div class="status-row">
+          <a class="visit" href="https://byggvir63.github.io/portfolio/">Ouvrir Focus</a>
+        </div>
+      </article>
+ 
+    </div>
+  </div>
+</main>
+ 
+<footer>
+  <div class="wrap">
+    <p class="colophon"><strong>3</strong> portails ouverts, <strong>8</strong> facettes à créer</p>
+    <p class="colophon">Mis à jour à la main, de temps en temps.</p>
+  </div>
+</footer>
+ 
+</body>
+</html>
